@@ -72,4 +72,38 @@ describe('Testing Bicicletas Api', function(){
     })
     });
 
+    describe('Get Por Code',()=>{
+        it("Se consulta una Bicicleta",(done)=>{
+            var a= Bicicleta.createInstance(1,'rojo','urbana',[10.522069, -74.186205]);
+
+                
+                Bicicleta.add(a,(err, bici)=>{
+                    if(err) console.log(err);
+                    return bici;
+                });
+            request.get('http://localhost:3000/api/bicicletas/1',function(err,response,body){
+                    expect(response.statusCode).toBe(200);
+
+                    done();
+            });
+        })
+    });
+
+    describe('Delete Por Code',()=>{
+        it("Se elimina una Bicicleta",(done)=>{
+            var a= Bicicleta.createInstance(1,'rojo','urbana',[10.522069, -74.186205]);
+
+                
+                Bicicleta.add(a,(err, bici)=>{
+                    if(err) console.log(err);
+                    return bici;
+                });
+            request.delete('http://localhost:3000/api/bicicletas/1/delete',function(err,response,body){
+                    expect(response.statusCode).toBe(204);
+
+                    done();
+            });
+        })
+    });
+
 })
