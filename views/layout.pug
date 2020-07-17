@@ -23,4 +23,34 @@ html
     link(rel='stylesheet' href='https://unpkg.com/leaflet@1.6.0/dist/leaflet.css' integrity='sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==' crossorigin='')
     script(src='https://unpkg.com/leaflet@1.6.0/dist/leaflet.js' integrity='sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==' crossorigin='')
   body
+    // ======= Header =======
+    header#header
+      .container.d-flex.align-items-center
+        .logo.mr-auto
+          h1.text-light
+            a(href='/')
+              | Bicicleitor
+              span .
+          // Uncomment below if you prefer to use an image logo
+          // <a href="index.html"><img src="/images/logo.png" alt="" class="img-fluid"></a>
+        nav.nav-menu.d-none.d-lg-block
+          ul
+            li.active
+              a(href='/') Home
+            li
+              a(href='/#about') About Us
+            li
+              a(href='/#services') Services
+            li
+              a(href='/#portfolio') Portfolio
+            li
+              a(href='/#team') Team
+            li
+              a(href='bicicletas') Bicicletas
+            li
+              a(href='/#contact') Contact Us
+            li.get-started
+              a(href='/#about') Get Started
+        // .nav-menu
+    // End Header
     block content

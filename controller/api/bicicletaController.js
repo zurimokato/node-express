@@ -1,6 +1,8 @@
 var Bicicleta =require('../../models/bicicleta');
 
 
+
+
 exports.bicicleta_list=function(req,res){
    Bicicleta.allBicis((err,bicicletas)=>{
         if(err) console.log(err);
