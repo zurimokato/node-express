@@ -12,7 +12,7 @@ module.exports={
                 if(!user) return res.status(400).send({msg:'no encontramos un usario'});
                 if(user.verificado) return res.redirect('/usuarios');
                 user.verificado=true;
-                usuarios.save(function(err){
+                user.save(function(err){
                     if(err) return res.status(500).send({msg:err.message})
                    res.redirect('/');
                 });

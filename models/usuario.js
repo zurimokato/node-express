@@ -46,14 +46,38 @@ usuarioSchema.plugin(uniqueValidator,{message:'el {PATH} ya existe con otro usua
 
 
 usuarioSchema.statics.createInstance=function(nombre,email,password){
-    return new this({nombre:nombre,email:email,password:password});
+    return new this({
+        nombre:nombre,
+        email:email,
+        password:password
+    });
 }
 
 usuarioSchema.statics.add=function(usuairo,cb){
+
+    usuairo.enviarEmail((err, succes)=>{
+        if(err)console.log(err);
+
+        console.log(succes)
+    })
     return this.create(usuairo,cb);
 }
 usuarioSchema.statics.allUsers=function(cb){
     return this.find({},cb)
+}
+usuarioSchema.statics.findByCode=function(id,cb){
+    return this.findOne({_id:id}, cb);
+}
+
+usuarioSchema.statics.updateByCode=function(id,aUser,cb){
+    return this.findOneAndUpdate({_id:id},{
+            _id:id,
+            nombre:aUser.nombre
+        },cb);
+}
+
+usuarioSchema.statics.deleteById=function(_id){
+    return this.deleteOne({_id:_id}, cb)
 }
 usuarioSchema.pre('save',function(next){
     if(this.isModified('password')){
@@ -62,18 +86,18 @@ usuarioSchema.pre('save',function(next){
     next();
 });
 
-usuarioSchema.method.validPassword=function(password){
+usuarioSchema.methods.validPassword=function(password){
     return bcrypt.compareSync(password,this.password);
 }
 
 
-usuarioSchema.method.reservar=function(bici,desde,hasta,cb){
+usuarioSchema.methods.reservar=function(bici,desde,hasta,cb){
     var reserva=new Reserva({usuario:this._id,bicicleta:bici,desde:desde,hasta:hasta});
     console.log(reserva);
     
 }
 
-usuarioSchema.method.enviarEmail=function(cb){
+usuarioSchema.methods.enviarEmail=function(cb){
     const token= new Token({_userId:this._id,token:crypto.randomBytes(16).toString('hex')});
     const emailDestination= this.email;
     token.save(function(err){
