@@ -7,8 +7,14 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var bicicletasRouter = require('./routes/bicicletas');
-var bicicletaApiRouter=require('./routes/api/bicicletas');
+var tokenRouter = require('./routes/token');
 
+//apis
+var bicicletaApiRouter=require('./routes/api/bicicletas');
+var userApiRouter=require('./routes/api/user');
+var tokenApiRouter=require('./routes/api/token');
+
+//mongoose
 var moongose=require('mongoose');
 var mongodb='mongodb://localhost/red-bicicletas';
 
@@ -36,9 +42,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/usuarios', usersRouter);
 app.use('/bicicletas', bicicletasRouter);
+app.use('/token', tokenRouter);
+//api
 app.use('/api/bicicletas',bicicletaApiRouter);
+app.use('api/users',userApiRouter);
+app.use('api/token', tokenApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

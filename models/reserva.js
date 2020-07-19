@@ -15,4 +15,4 @@ reservaSchema.methods.diasReserva=function(){
 }
 
 
-module.exports=reservaSchema;
+module.exports=mongoose.model('Reserva',reservaSchema);
