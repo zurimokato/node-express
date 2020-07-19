@@ -3,6 +3,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var Usuairo =require('./models/usuario');
+
+//sesion
+const passport = require('./config/passport')
+const session=require('express-session')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -16,6 +21,7 @@ var tokenApiRouter=require('./routes/api/token');
 
 //mongoose
 var moongose=require('mongoose');
+const token = require('./models/token');
 var mongodb='mongodb://localhost/red-bicicletas';
 
 moongose.connect(mongodb,{useNewUrlParser:true,useUnifiedTopology: true }).then( ()=>{console.log('Connected')}).
@@ -29,7 +35,17 @@ var db=moongose.connection;
 
 db.on('Error',console.error.bind(console,'MongoDB connection error:'));
 
+const store= new session.MemoryStore;
+
 var app = express();
+
+app.use(session({
+  cookie:{maxAge:240*60*60*100},
+  store:store,
+  saveUninitialized:true,
+  resave:'true',
+  secret:'red_bicis_!!!****!"-!"-!"-!"-!"-!"-123123',
+}))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -39,11 +55,80 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/login',function(req, res){
+  res.render('session/login');
+});
+
+app.post('/login',function(req,res,next){
+  //passport
+
+  passport.authenticate('local', function(err, user, info){
+    if(err) return next(err);
+    if(!user) return res.render('/session/login', {info});
+    req.logIn(user,function(err){
+      if(err) return next(err);
+      return res.redirect('/')
+    });
+  })(req,res,next);
+});
+
+app.get('/logout',function(req,res){
+
+  req.logOut();
+  res.redirect('/')
+});
+
+app.get('/forgotPassword', function(req,res){
+  res.render('session/forgotPassword');
+});
+
+app.post('/forgotPassword',function(req,res){
+  Usuairo.findOne({email:req.body.email},function(err,user){
+    if(!user) return res.render('session/forgotPassword',{info:{menssage:'No se encontro usuario registrado con este email'}});
+    user.resetPassword(function(err){
+      console.log('session/forgotPassword');
+    });
+    res.render('session/forgotPasswordMessage');
+   });
+});
+
+app.get('/session/resetPassword/:token',function(req,res, next){
+  token.findOne({token:req.params.token},function(err, token){
+    if(!token) return res.status(400).send({type:'not-verfied',msg:''});
+    console.log(token);
+    Usuairo.findById({_id:token._userId},function(err,user){
+      if(!user){return res.status(400).send({msg:'No existe registro del usuario'});
+    }else{
+      res.render('session/resetPassword',{usuario:user});
+    }
+    });
+  });
+});
+
+app.post('/session/resetPassword',function(req,res){
+  if(req.body.password != req.body.confirm_password) { 
+    res.render('session/resetPassword',{errors:{confirm_password:{message:'las contraseñas deben ser iguales'}}});
+    return;
+  }
+  Usuairo.findOne({email:req.body.email},function(err,user){
+    user.password=req.body.password;
+    user.save(function(err){
+      if(err) {
+        return res.render('session/resetPassword',{errors:err.errors, usuario:new Usuairo('error','error','error')});
+      }else{
+        res.redirect('/login')
+      }
+    });
+  })
+});
 
 app.use('/', indexRouter);
 app.use('/usuarios', usersRouter);
-app.use('/bicicletas', bicicletasRouter);
+app.use('/bicicletas',loggedIn, bicicletasRouter);
 app.use('/token', tokenRouter);
 //api
 app.use('/api/bicicletas',bicicletaApiRouter);
@@ -65,5 +150,14 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+function loggedIn(req, res, next){
+  if(req.user){
+    next()
+  }else{
+    console.log('user sin logeaser');
+    res.redirect('/login');
+  }
+}
 
 module.exports = app;

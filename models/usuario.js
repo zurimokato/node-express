@@ -6,6 +6,7 @@ var mailer=require('../mailer/mailer');
 const uniqueValidator=require('mongoose-unique-validator');
 var Schema=mongoose.Schema;
 const bcrypt = require('bcrypt');
+const token = require('./token');
 const saltRounds=10;
 
 const validateEmail=function(email){
@@ -44,6 +45,29 @@ var usuarioSchema= new Schema({
 
 usuarioSchema.plugin(uniqueValidator,{message:'el {PATH} ya existe con otro usuario.'});
 
+
+usuarioSchema.methods.resetPassword=function(cb){
+    const token= new Token({_userId:this._id,token:crypto.randomBytes(16).toString('hex')});
+    this.passwordResetToken=token.token;
+    const emailDestination= this.email;
+    token.save(function(err){
+        if(err) return console.log(err);
+
+        const emailOption={
+            from: '"admin 👻" <noreply@example.com>', // sender address
+            to: emailDestination, // list of receivers
+            subject: "Cambio de contraseña", // Subject line
+            text: "Hola n.n\n"+ "Por favor para cambiar su contraseña de click en el siguiente link:\n"+ 'http://localhost:3000/'+'\session/resetPassword/'+token.token+'\n', // plain text body
+        };
+
+        mailer.sendMail(emailOption, function(err){
+            if(err){return console.log(err)}
+
+
+            console.log("verificacion email ha sido enviado a"+ emailDestination);
+        })
+    });
+}
 
 usuarioSchema.statics.createInstance=function(nombre,email,password){
     return new this({
