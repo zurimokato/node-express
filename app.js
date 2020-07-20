@@ -6,8 +6,12 @@ var logger = require('morgan');
 var Usuairo =require('./models/usuario');
 
 //sesion
-const passport = require('./config/passport')
-const session=require('express-session')
+const passport = require('./config/passport');
+const session=require('express-session');
+
+//jwt
+
+const jwt=require('jsonwebtoken');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,6 +22,7 @@ var tokenRouter = require('./routes/token');
 var bicicletaApiRouter=require('./routes/api/bicicletas');
 var userApiRouter=require('./routes/api/user');
 var tokenApiRouter=require('./routes/api/token');
+var oauthApiRouter=require('./routes/api/oauth');
 
 //mongoose
 var moongose=require('mongoose');
@@ -45,7 +50,9 @@ app.use(session({
   saveUninitialized:true,
   resave:'true',
   secret:'red_bicis_!!!****!"-!"-!"-!"-!"-!"-123123',
-}))
+}));
+
+app.set('secret-key','jwt_pwd_!!223334444');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -131,9 +138,11 @@ app.use('/usuarios', usersRouter);
 app.use('/bicicletas',loggedIn, bicicletasRouter);
 app.use('/token', tokenRouter);
 //api
-app.use('/api/bicicletas',bicicletaApiRouter);
-app.use('api/users',userApiRouter);
-app.use('api/token', tokenApiRouter);
+app.use('/api/bicicletas', validarUserId,bicicletaApiRouter);
+app.use('/api/users',userApiRouter);
+app.use('/api/token', tokenApiRouter);
+app.use('/api/oauth', oauthApiRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -158,6 +167,19 @@ function loggedIn(req, res, next){
     console.log('user sin logeaser');
     res.redirect('/login');
   }
+}
+
+function validarUserId(req, res, next){
+  jwt.verify(req.headers['x-access-token'], req.app.get('secretKey',function(err, decode){
+    if(err){
+      console.log(err);
+    }else{
+      req.body.userId=decode.id;
+      console.log('jwt verify: '+ decode);
+      next();
+    }
+  })
+  );
 }
 
 module.exports = app;
