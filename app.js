@@ -30,7 +30,7 @@ const token = require('./models/token');
 //mongoose
 var moongose=require('mongoose');
 //var mongodb='mongodb://localhost/red-bicicletas';
-var mongodb=process.env.MONG_URI;
+var mongodb=process.env.MONGO_URI;
 moongose.connect(mongodb,{useNewUrlParser:true,useUnifiedTopology: true }).then( ()=>{console.log('Connected')}).
 catch((err)=>{
   console.log('Error to conect '+err.message);
