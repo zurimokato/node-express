@@ -7,6 +7,7 @@ const uniqueValidator=require('mongoose-unique-validator');
 var Schema=mongoose.Schema;
 const bcrypt = require('bcrypt');
 const token = require('./token');
+const { response } = require('express');
 const saltRounds=10;
 
 const validateEmail=function(email){
@@ -45,6 +46,34 @@ var usuarioSchema= new Schema({
 
 usuarioSchema.plugin(uniqueValidator,{message:'el {PATH} ya existe con otro usuario.'});
 
+usuarioSchema.statics.findOrCreateByGoogle=function findOneOrCreate(condition, callback){
+    const self=this;
+    console.log(condition);
+    self.findOne({
+        $or:[
+            {'googleID':condition.id},{'email':condition.emails[0].value}
+        ]},
+        (err, result)=>{
+            console.log('-----------CONDITION--------');
+            console.log(condition);
+            let values={};
+            values.googleID=condition.id;
+            values.email=condition.emails[0].value;
+            values.nombre=condition.displayName||'SIN NOMBRE';
+            values.verificado=true;
+            values.password=condition._json.etag;
+            console.log('------VALUES-----');
+            console.log(values);
+            self.create(values, (err, result)=>{
+                if(err) console.log(err);
+                return callback(err, result);
+            })
+        }
+
+    )
+
+}
+
 
 usuarioSchema.methods.resetPassword=function(cb){
     const token= new Token({_userId:this._id,token:crypto.randomBytes(16).toString('hex')});
@@ -57,7 +86,7 @@ usuarioSchema.methods.resetPassword=function(cb){
             from: '"admin 👻" <noreply@example.com>', // sender address
             to: emailDestination, // list of receivers
             subject: "Cambio de contraseña", // Subject line
-            text: "Hola n.n\n"+ "Por favor para cambiar su contraseña de click en el siguiente link:\n"+ 'http://localhost:3000/'+'\session/resetPassword/'+token.token+'\n', // plain text body
+            text: "Hola n.n\n"+ "Por favor para cambiar su contraseña de click en el siguiente link:\n"+ process.env.HOST+'\session/resetPassword/'+token.token+'\n', // plain text body
         };
 
         mailer.sendMail(emailOption, function(err){
@@ -131,7 +160,7 @@ usuarioSchema.methods.enviarEmail=function(cb){
             from: '"admin 👻" <noreply@example.com>', // sender address
             to: emailDestination, // list of receivers
             subject: "Verificacion de cuenta ✔", // Subject line
-            text: "Hola n.n\n"+ "Por favor para verificar su cuenta de click en el siguiente link:\n"+ 'http://localhost:3000'+'\/token/confirmation/'+token.token+'\n', // plain text body
+            text: "Hola n.n\n"+ "Por favor para verificar su cuenta de click en el siguiente link:\n"+process.env.HOST+'\/token/confirmation/'+token.token+'\n', // plain text body
             html: "<b>Hello world?</b>"
         };
 
