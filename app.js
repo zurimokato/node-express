@@ -72,7 +72,7 @@ app.get('/login',function(req, res){
   res.render('session/login');
 });
 
-app.get('/google33ccaabccb16f403', function(req,res){
+app.get('/google33ccaabccb16f403.html', function(req,res){
   res.sendfile(__dirname + '/views/google33ccaabccb16f403.html');
 })
 
