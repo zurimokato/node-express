@@ -73,7 +73,7 @@ app.get('/login',function(req, res){
 });
 
 app.get('/google33ccaabccb16f403', function(req,res){
-  res.render('google33ccaabccb16f403')
+  res.sendfile(__dirname + '/views/google33ccaabccb16f403.html');
 })
 
 app.post('/login',function(req,res,next){
