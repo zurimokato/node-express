@@ -89,15 +89,12 @@ app.get('/google33ccaabccb16f403.html', function(req,res){
 });
 
 app.get('/auth/google',
-    passport.authenticate('google',{scope:[
-      'http://www.googleapis.com/auth/plus.login',
-      'http://googleapis.com/auth/plus.profile.emails.read'
-    ]
-    })
+    passport.authenticate('google',{ scope: ['profile'] }
+    )
 );
 
 app.get('/auth/google/callback', passport.authenticate('google',{
-    successRedirect:'/',
+    successRedirect:'/usuarios',
     failWithError:'/error'
   })
 );
