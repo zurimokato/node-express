@@ -22,7 +22,7 @@ passport.use( new LocalStrategy(
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.HOST+"auth/google/callback"
+    callbackURL: process.env.HOST+"/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, cb) {
     Usuario.findOrCreateByGoogle({ googleId: profile.id }, function (err, user) {
