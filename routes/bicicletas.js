@@ -12,5 +12,4 @@ router.get('/:id/update',bicicletaController.bicicleta_update_get);
 router.post('/:id/update',bicicletaController.bicicleta_update_post);
 
 
-
 module.exports=router;  
