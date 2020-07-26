@@ -11,6 +11,6 @@ router.post('/:id/delete',bicicletaController.bicicleta_delete_post);
 router.get('/:id/update',bicicletaController.bicicleta_update_get);
 router.post('/:id/update',bicicletaController.bicicleta_update_post);
 
-router.get('/google33ccaabccb16f403.html', bicicletaController.bicicleta_verify)
+
 
 module.exports=router;  

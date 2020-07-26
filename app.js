@@ -72,6 +72,10 @@ app.get('/login',function(req, res){
   res.render('session/login');
 });
 
+app.get('/google33ccaabccb16f403', function(req,res){
+  res.render('google33ccaabccb16f403')
+})
+
 app.post('/login',function(req,res,next){
   //passport
 

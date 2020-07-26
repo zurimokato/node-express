@@ -25,9 +25,7 @@ exports.bicicleta_create_post=function(req,res){
 
    
 }
-exports.bicicleta_verify=function(req,res){
-    res.render('google33ccaabccb16f403.html')
-}
+
 exports.bicicleta_delete_post=function(req,res){
     Bicicleta.removeByCode(req.params.id,(err, result)=>{
         if(err)console.log(err);
