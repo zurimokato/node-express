@@ -11,7 +11,7 @@ module.exports={
                 if(user ===null){return res.estatus(400).json({status:400, messagge:'usuario no encontrado',data:null})}
                 if(user !=null && bycript.compareSync(req.body.password, user.password)){
                     user.save(function(err,usuario){
-                        const token=jwt.sign({id:usuario._id}, req.app.get('secret-key'), {expiresIn:'7d'});
+                        const token=jwt.sign({id:usuario._id}, req.app.get('secret-key'), {expiresIn:'10 days'});
                         res.status(200).json({messagge:'usuario encontrado', data:{usuario:usuario,token:token}});
 
                     });

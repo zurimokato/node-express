@@ -1,3 +1,4 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -23,12 +24,13 @@ var bicicletaApiRouter=require('./routes/api/bicicletas');
 var userApiRouter=require('./routes/api/user');
 var tokenApiRouter=require('./routes/api/token');
 var oauthApiRouter=require('./routes/api/oauth');
+const token = require('./models/token');
+
 
 //mongoose
 var moongose=require('mongoose');
-const token = require('./models/token');
-var mongodb='mongodb://localhost/red-bicicletas';
-
+//var mongodb='mongodb://localhost/red-bicicletas';
+var mongodb=process.env.MONG_URI;
 moongose.connect(mongodb,{useNewUrlParser:true,useUnifiedTopology: true }).then( ()=>{console.log('Connected')}).
 catch((err)=>{
   console.log('Error to conect '+err.message);
@@ -138,7 +140,7 @@ app.use('/usuarios', usersRouter);
 app.use('/bicicletas',loggedIn, bicicletasRouter);
 app.use('/token', tokenRouter);
 //api
-app.use('/api/bicicletas', validarUserId,bicicletaApiRouter);
+app.use('/api/bicicletas', validarUsuario,bicicletaApiRouter);
 app.use('/api/users',userApiRouter);
 app.use('/api/token', tokenApiRouter);
 app.use('/api/oauth', oauthApiRouter);
@@ -169,17 +171,18 @@ function loggedIn(req, res, next){
   }
 }
 
-function validarUserId(req, res, next){
-  jwt.verify(req.headers['x-access-token'], req.app.get('secretKey',function(err, decode){
+function validarUsuario(req, res, next){
+  jwt.verify(req.headers['x-acces-token'], req.app.get('secretKey'), function(err, decoded){
     if(err){
-      console.log(err);
+      res.json({status: "error", message: err.message, data: null});
+
     }else{
-      req.body.userId=decode.id;
-      console.log('jwt verify: '+ decode);
+      req.body.userId = decode.id;
+
+      console.log ('jwt verify: '+  decoded );  
       next();
     }
-  })
-  );
+  });
 }
 
 module.exports = app;
