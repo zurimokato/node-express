@@ -22,7 +22,7 @@
     "lodash": ">=4.17.21",
     "marked": ">=4.0.10",
     "minimist": "^1.2.5",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "mongoose": "^5.11.18",
     "mongoose-unique-validator": "^2.0.3",
     "morgan": "~1.9.1",
